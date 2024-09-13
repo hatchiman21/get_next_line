@@ -10,7 +10,11 @@ int main()
 
 	i = 0;
     fd = open("test.txt", O_RDWR);
-	while (i++ < 3)
-    	printf("%d\n",printf("%s",get_next_line(fd)));
+	while (i++ < 5)
+	{
+		res = get_next_line(fd);
+    	printf("%d : %s",i,res);
+		free(res);
+	}
     return 0;
 }
