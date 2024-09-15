@@ -23,10 +23,10 @@ int main()
 
 	i = 0;
 	fd = open("test.txt", O_RDWR);
-	while (i++ < 2)
+	while (i++ < 3)
 	{
 		res = get_next_line(fd);
-		printf("%d : %s \n", i, res);
+		printf("%d : %s", i, res);
 		free(res);
 	}
 	return 0;

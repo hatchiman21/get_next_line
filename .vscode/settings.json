@@ -4,6 +4,7 @@
 		"get_next_line.h": "c",
 		"stdlib.h": "c",
 		"get_next_line_bonus.h": "c",
-		"fcntl.h": "c"
+		"fcntl.h": "c",
+		"string.h": "c"
 	}
 }

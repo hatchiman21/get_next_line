@@ -93,27 +93,16 @@ void	*ft_memmove(void *dest, const void *src, size_t n)
 	return (dest);
 }
 
-char	*ft_strjoin(char const *s1, char const *s2)
+int	ft_strchr(const char *s, int c)
 {
-	char	*res;
-	int		i;
-	int		j;
+	int	i;
 
 	i = 0;
-	j = 0;
-	res = (char *)malloc(sizeof(char) * (ft_strlen(s1) + ft_strlen(s2) + 1));
-	if (!res)
-		return (NULL);
-	while (s1[i])
+	while (( s[i]))
 	{
-		res[i] = s1[i];
+		if (s[i] == (char)c)
+			return (i + 1);
 		i++;
 	}
-	while (s2[j])
-	{
-		res[i + j] = s2[j];
-		j++;
-	}
-	res[i + j] = '\0';
-	return (res);
+	return (-1);
 }

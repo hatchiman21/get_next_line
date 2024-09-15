@@ -13,112 +13,136 @@
 #include "get_next_line.h"
 #include <string.h>
 
-char	*merge(char *res, char *word)
+void	ft_lstclear_item(t_next_line **lst)
 {
-	char	*temp;
+	t_next_line	*temp;
 
-	temp = res;
-	res = ft_strjoin(temp, word);
-	free (word);
+	if (!*lst)
+		return ;
+	temp = *lst;
+	temp->fd = -2;
+	if (temp->buffer)
+		free (temp->buffer);
+	*lst = temp->next;
+	if (!temp->next)
+		*lst = NULL;
 	free (temp);
-	return (res);
+	temp = NULL;
 }
 
-int	ft_strchr(const char *s, int c)
+char	*merge(char *word1, char *word2, int f, int i)
 {
-	int	i;
+	char	*res;
+	int		j;
 
-	i = 0;
-	while (( s[i]))
+	j = 0;
+	if (f == -1)
+		res = (char *)malloc(sizeof(char) * (ft_strlen(word1) + ft_strlen(word2) + 1));
+	else
+		res = (char *)malloc(sizeof(char) * (ft_strlen(word1) + f + 2));
+	if (!res)
+		return (NULL);
+	while (word1[i])
 	{
-		if (s[i] == (char)c)
-			return (i + 1);
+		res[i] = word1[i];
 		i++;
 	}
-	return (-1);
-}
-
-
-
-
-static char	*get_result(int fd, char *buff, int i, char *res, int *used_buffer)
-{	
-	int		bytes_read;
-
-	bytes_read = 1;
-	*used_buffer = 1;
-	while (i == -1 && bytes_read > 0)
+	while ((f == -1 && word2[j]) || (j < f))
 	{
-		bytes_read = read(fd, buff, BUFFER_SIZE);
-		if (bytes_read == 0)
-		{
-			*used_buffer = -1;
-			free (buff);
-			buff = NULL;
-			return (res);
-		}
-		buff[bytes_read] = '\0';
-		i = ft_strchr(buff, '\n');
-		if (i != -1)
-		{
-			res = merge(res, ft_substr(buff, 0, i));
-			if (!(buff + i + 1))
-				*used_buffer = 0;
-			ft_memmove(buff, (buff + i), ft_strlen(buff + i) + 1);
-			return (res);
-		}
-		res = merge(res, ft_substr(buff, 0, ft_strlen(buff)));
-		if (ft_strlen(buff) == 0 && bytes_read < BUFFER_SIZE)
-		{
-			free (buff);
-			buff = NULL;
-		}
+		res[i + j] = word2[j];
+		j++;
 	}
+	res[i + j] = '\0';
+	free (word1);
 	return (res);
 }
 
-void	assgine_res(char **res)
+static t_next_line	*get_buffer(t_next_line **all_fd, int fd)
 {
-	*res = (char *)malloc(sizeof(char));
-	*res[0] = '\0';
+	t_next_line	*check;
+	t_next_line	*new;
+
+	check = *all_fd;
+	while (check)
+	{
+		if (check != NULL && check->fd == fd)
+			return (check);
+		check = check->next;
+	}
+	new = (t_next_line *)malloc(sizeof(t_next_line));
+	if (!new)
+		return (NULL);
+	new->fd = fd;
+	new->buffer = (char *)malloc(sizeof(char) * (BUFFER_SIZE + 1));
+	if (!(new->buffer))
+	{
+		free(new);
+		return (NULL);
+	}
+	new->used_buffer = -1;
+	new->buffer[0] = '\0';
+	new->next = *all_fd;
+	*all_fd = new;
+	return (new);
+}
+
+static char	*get_result(int fd, t_next_line *current, int i, char *res)
+{
+	int		bytes_read;
+
+	res = merge(res, current->buffer, i, 0);
+	bytes_read = 1;
+	current->used_buffer = 1;
+	while (i == -1 && bytes_read > 0)
+	{
+		bytes_read = read(fd, current->buffer, BUFFER_SIZE);
+		if (bytes_read == 0)
+		{
+			current->used_buffer = -1;
+			ft_lstclear_item (&current);
+			return (res);
+		}
+		current->buffer[bytes_read] = '\0';
+		i = ft_strchr(current->buffer, '\n');
+		if (i != -1)
+		{
+			res = merge(res, current->buffer, i, 0);
+			if (ft_strlen(current->buffer + i) == 0)
+				current->used_buffer = 0;
+			ft_memmove(current->buffer, (current->buffer + i), ft_strlen(current->buffer + i) + 1);
+			return (res);
+		}
+		res = merge(res, current->buffer, i, 0);
+		if (ft_strlen(current->buffer) == 0 && bytes_read < BUFFER_SIZE)
+			ft_lstclear_item (&current);
+	}
+	return (res);
 }
 
 char	*get_next_line(int fd)
 {
-	static char	*buffer;
-	static	int	used_buffer;
+	static t_next_line	*all_fd;
+	t_next_line			*current;
 	int			i;
 	char		*res;
 
 	i = -1;
-	if (!used_buffer)
-		used_buffer = -1;
-	if (fd == -1)
+	res = NULL;
+	if (fd == -1 || read(fd, res, 0) == -1)
 		return (NULL);
-	if (used_buffer == -1)
-	{
-		used_buffer = 0;
-		buffer = (char *)malloc(sizeof(char) * (BUFFER_SIZE + 1));
-		buffer[0] = '\0';
-	}
-	if (read(fd, buffer, 0) == -1)
-	{
-		used_buffer = -1;
-		free (buffer);
-		buffer = NULL;
-		return (NULL);
-	}
-	assgine_res(&res);
-	if (used_buffer == 1)
-		i = ft_strchr(buffer, '\n');
+	current = get_buffer(&all_fd, fd);
+	res = (char *)malloc(sizeof(char));
+	res[0] = '\0';
+	if (current->used_buffer == 1)
+		i = ft_strchr(current->buffer, '\n');
 	if (i != -1)
 	{
-		res = merge(res, ft_substr(buffer, 0, i));
-		ft_memmove(buffer, (buffer + i), ft_strlen(buffer + i) + 1);
+		res = merge(res, current->buffer, i, 0);
+		ft_memmove(current->buffer, (current->buffer + i), ft_strlen(current->buffer + i) + 1);
 		return (res);
 	}
 	else
-	res = get_result(fd, buffer, i, res, &used_buffer);
+		res = get_result(fd, current, i, res);
 	if (ft_strlen(res) == 0)
 	{
 		free (res);

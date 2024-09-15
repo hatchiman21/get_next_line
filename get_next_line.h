@@ -24,12 +24,14 @@
 typedef struct s_next_line
 {
 	int					fd;
+	int					used_buffer;
 	char				*buffer;
 	struct s_next_line	*next;
 }	t_next_line;
 
 size_t	ft_strlen(const char *s);
 char	*ft_strjoin(char const *s1, char const *s2);
+int		ft_strchr(const char *s, int c);
 char	*ft_strdup(const char *s);
 char	*ft_substr(char const *s, unsigned int start, size_t len);
 
