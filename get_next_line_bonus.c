@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*   get_next_line_bonus.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: aatieh <aatieh@student.42amman.com>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/16 16:43:03 by aatieh            #+#    #+#             */
-/*   Updated: 2025/01/28 19:31:31 by aatieh           ###   ########.fr       */
+/*   Updated: 2025/01/28 19:37:14 by aatieh           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 
 char	*merge(char *word1, char *word2, int f, int i)
 {
@@ -41,13 +41,46 @@ char	*merge(char *word1, char *word2, int f, int i)
 	return (res);
 }
 
-int	first_step(char *buff, int fd, int *bytes_read, char **res)
+t_list	*find_buffer(int fd, t_list **storage, t_list *tmp)
+{
+	while (tmp)
+	{
+		if (tmp->fd == fd)
+			return (tmp);
+		tmp = tmp->next;
+	}
+	tmp = malloc(sizeof(t_list));
+	if (!tmp)
+		return (NULL);
+	tmp->buff = malloc(sizeof(char) * (BUFFER_SIZE + 1));
+	if (!tmp->buff)
+		free(tmp);
+	if (!tmp)
+		return (NULL);
+	ft_bzero((tmp->buff), BUFFER_SIZE + 1);
+	tmp->fd = fd;
+	if (!*storage)
+	{
+		tmp->next = NULL;
+		*storage = tmp;
+		return (*storage);
+	}
+	tmp->next = *storage;
+	*storage = tmp;
+	return (tmp);
+}
+
+int	first_step(t_list **storage, int fd, int *bytes_read, char **res)
 {
 	int		i;
+	char	*buff;
+	t_list	*current;
 
+	current = find_buffer(fd, storage, *storage);
+	buff = current->buff;
 	i = ft_strchr(buff, '\n');
 	if (ft_strlen(buff))
-		*res = merge(*res, buff, i, 0);
+		*res = merge (*res, buff, i, 0);
 	if (!*res)
 		return (-1);
 	if (i != 0)
@@ -58,33 +91,33 @@ int	first_step(char *buff, int fd, int *bytes_read, char **res)
 	*bytes_read = read(fd, buff, BUFFER_SIZE);
 	if (*bytes_read == -1)
 	{
-		free(*res);
+		free (*res);
 		return (-1);
 	}
 	ft_bzero((buff + *bytes_read), BUFFER_SIZE - *bytes_read + 1);
 	return (i);
 }
 
-char	*check_buffer(int fd, char *buff, int bytes_read)
+char	*check_buffer(int fd, t_list *current, char *res, t_list **storage)
 {
+	char	*buff;
 	int		i;
-	char	*res;
+	int		bytes_read;
 
 	i = 0;
-	res = malloc(sizeof(char));
-	if (!res)
-		return (NULL);
 	res[0] = '\0';
+	buff = current->buff;
+	bytes_read = BUFFER_SIZE;
 	while (i == 0)
 	{
-		i = first_step(buff, fd, &bytes_read, &res);
+		i = first_step(storage, fd, &bytes_read, &res);
 		if (i == -1)
 			return (NULL);
-		if ((bytes_read < BUFFER_SIZE && !ft_strlen(buff) && !i))
+		if ((bytes_read == 0 && !ft_strlen(buff)))
 		{
 			if (!ft_strlen(res))
 			{
-				free(res);
+				free (res);
 				return (NULL);
 			}
 			return (res);
@@ -93,32 +126,28 @@ char	*check_buffer(int fd, char *buff, int bytes_read)
 	return (res);
 }
 
-char	*assgine_buff(char *buff)
-{
-	if (buff)
-		return (buff);
-	buff = malloc(sizeof(char) * (BUFFER_SIZE + 1));
-	if (!buff)
-		return (NULL);
-	ft_bzero(buff, BUFFER_SIZE + 1);
-	return (buff);
-}
-
 char	*get_next_line(int fd)
 {
-	static char	*buff;
-	char		*res;
+	static t_list	*storage;
+	char			*res;
+	t_list			*current;
 
 	if (fd == -1 || BUFFER_SIZE <= 0)
 		return (NULL);
-	buff = assgine_buff(buff);
-	if (!buff)
-		return (NULL);
-	res = check_buffer(fd, buff, BUFFER_SIZE);
-	if (res == NULL || !ft_strncmp(buff, "", 2))
+	res = malloc(sizeof(char));
+	if (!res)
 	{
-		free(buff);
-		buff = NULL;
+		ft_lstclear_item(&storage, fd);
+		return (NULL);
 	}
+	current = find_buffer(fd, &storage, storage);
+	if (!current)
+	{
+		free(res);
+		return (NULL);
+	}
+	res = check_buffer(fd, current, res, &storage);
+	if (res == NULL || current->buff[0] == '\0')
+		ft_lstclear_item(&storage, fd);
 	return (res);
 }
