@@ -6,7 +6,7 @@
 /*   By: aatieh <aatieh@student.42amman.com>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/16 16:43:10 by aatieh            #+#    #+#             */
-/*   Updated: 2025/01/28 19:23:28 by aatieh           ###   ########.fr       */
+/*   Updated: 2025/01/28 19:54:40 by aatieh           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,10 +72,10 @@ void	*ft_memmove(void *dest, const void *src, size_t n)
 	return (dest);
 }
 
-char	*ft_lstclear_item(t_list **lst, int fd)
+char	*ft_lstclear_item(t_line_list **lst, int fd)
 {
-	t_list	*tmp;
-	t_list	*step;
+	t_line_list	*tmp;
+	t_line_list	*step;
 
 	tmp = *lst;
 	while (tmp)

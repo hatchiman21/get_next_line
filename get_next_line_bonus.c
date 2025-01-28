@@ -6,7 +6,7 @@
 /*   By: aatieh <aatieh@student.42amman.com>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/16 16:43:03 by aatieh            #+#    #+#             */
-/*   Updated: 2025/01/28 19:37:14 by aatieh           ###   ########.fr       */
+/*   Updated: 2025/01/28 19:55:46 by aatieh           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ char	*merge(char *word1, char *word2, int f, int i)
 	return (res);
 }
 
-t_list	*find_buffer(int fd, t_list **storage, t_list *tmp)
+t_line_list	*find_buffer(int fd, t_line_list **storage, t_line_list *tmp)
 {
 	while (tmp)
 	{
@@ -49,7 +49,7 @@ t_list	*find_buffer(int fd, t_list **storage, t_list *tmp)
 			return (tmp);
 		tmp = tmp->next;
 	}
-	tmp = malloc(sizeof(t_list));
+	tmp = malloc(sizeof(t_line_list));
 	if (!tmp)
 		return (NULL);
 	tmp->buff = malloc(sizeof(char) * (BUFFER_SIZE + 1));
@@ -70,11 +70,11 @@ t_list	*find_buffer(int fd, t_list **storage, t_list *tmp)
 	return (tmp);
 }
 
-int	first_step(t_list **storage, int fd, int *bytes_read, char **res)
+int	first_step(t_line_list **storage, int fd, int *bytes_read, char **res)
 {
-	int		i;
-	char	*buff;
-	t_list	*current;
+	int			i;
+	char		*buff;
+	t_line_list	*current;
 
 	current = find_buffer(fd, storage, *storage);
 	buff = current->buff;
@@ -98,7 +98,8 @@ int	first_step(t_list **storage, int fd, int *bytes_read, char **res)
 	return (i);
 }
 
-char	*check_buffer(int fd, t_list *current, char *res, t_list **storage)
+char	*check_buffer(int fd, t_line_list *current, char *res,
+			t_line_list **storage)
 {
 	char	*buff;
 	int		i;
@@ -128,9 +129,9 @@ char	*check_buffer(int fd, t_list *current, char *res, t_list **storage)
 
 char	*get_next_line(int fd)
 {
-	static t_list	*storage;
-	char			*res;
-	t_list			*current;
+	static t_line_list	*storage;
+	char				*res;
+	t_line_list			*current;
 
 	if (fd == -1 || BUFFER_SIZE <= 0)
 		return (NULL);
