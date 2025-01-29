@@ -6,7 +6,7 @@
 /*   By: aatieh <aatieh@student.42amman.com>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/16 16:43:10 by aatieh            #+#    #+#             */
-/*   Updated: 2025/01/28 18:50:17 by aatieh           ###   ########.fr       */
+/*   Updated: 2025/01/29 20:06:03 by aatieh           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ size_t	ft_strlen(const char *s)
 	return (i);
 }
 
-int	ft_strchr(const char *s, int c)
+int	ft_strchr_find(const char *s, int c)
 {
 	int	i;
 

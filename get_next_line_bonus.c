@@ -6,7 +6,7 @@
 /*   By: aatieh <aatieh@student.42amman.com>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/16 16:43:03 by aatieh            #+#    #+#             */
-/*   Updated: 2025/01/28 19:55:46 by aatieh           ###   ########.fr       */
+/*   Updated: 2025/01/29 20:06:03 by aatieh           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,7 +78,7 @@ int	first_step(t_line_list **storage, int fd, int *bytes_read, char **res)
 
 	current = find_buffer(fd, storage, *storage);
 	buff = current->buff;
-	i = ft_strchr(buff, '\n');
+	i = ft_strchr_find(buff, '\n');
 	if (ft_strlen(buff))
 		*res = merge (*res, buff, i, 0);
 	if (!*res)

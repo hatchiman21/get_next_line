@@ -6,7 +6,7 @@
 /*   By: aatieh <aatieh@student.42amman.com>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/16 16:43:18 by aatieh            #+#    #+#             */
-/*   Updated: 2025/01/28 19:54:40 by aatieh           ###   ########.fr       */
+/*   Updated: 2025/01/29 20:06:03 by aatieh           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ typedef struct s_list
 
 void	ft_bzero(void *s, size_t n);
 size_t	ft_strlen(const char *s);
-int		ft_strchr(const char *s, int c);
+int		ft_strchr_find(const char *s, int c);
 void	*ft_memmove(void *dest, const void *src, size_t n);
 
 char	*ft_lstclear_item(t_line_list **lst, int fd);
